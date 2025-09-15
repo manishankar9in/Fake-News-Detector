@@ -1,5 +1,8 @@
+# Firebase service account
+backend/serviceAccount.json
 .env
 node_modules/
 __pycache__/
 *.pyc
 replace.txt
+firebase_service_account.json

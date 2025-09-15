@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import AuthService from './AuthService';
 import { MagnifyingGlassIcon, GlobeAltIcon, ChartBarIcon, LanguageIcon, CheckCircleIcon, AcademicCapIcon, ShieldCheckIcon, NewspaperIcon } from '@heroicons/react/24/outline';
 // Add Google Fonts for Montserrat, Poppins, Roboto, Open Sans
 if (typeof document !== 'undefined') {
@@ -13,7 +14,9 @@ export default function LandingPage() {
   // Modal state
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
-  const [user, setUser] = useState(null); // null if not logged in
+  const auth = AuthService();
+  const user = auth.user;
+  const history = auth.history;
   // Slideshow logic
   const slideImages = [
     '/slide photo.avif',
@@ -49,7 +52,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col" style={{ fontFamily: 'Roboto, Open Sans, Arial, sans-serif' }}>
-      {/* Top Navbar - DO NOT MODIFY */}
+  {/* Top Navbar - DO NOT MODIFY */}
       <nav className="w-full flex items-center justify-between px-8 py-4 shadow-md" style={{ backgroundColor: '#1E3A8A' }}>
         <div className="flex items-center">
           <img src="/fake news logo.png" alt="Fake News Logo" className="h-16 w-16 mr-4 rounded-full shadow-lg" style={{ objectFit: 'cover', background: '#fff' }} />
@@ -61,12 +64,16 @@ export default function LandingPage() {
           <button onClick={() => navigate('/about')} className="text-white font-bold text-lg hover:underline bg-transparent border-none cursor-pointer" style={{ fontFamily: 'Montserrat, Arial, sans-serif' }}>About</button>
           <button onClick={() => navigate('/contact')} className="text-white font-bold text-lg hover:underline bg-transparent border-none cursor-pointer" style={{ fontFamily: 'Montserrat, Arial, sans-serif' }}>Contact</button>
           {user ? (
-            <div className="relative">
-              <button className="ml-4 px-6 py-2 bg-blue-900 text-white font-bold rounded-full flex items-center gap-2" style={{ backgroundColor: '#0D47A1', fontFamily: 'Montserrat, Arial, sans-serif' }}>
+            <div className="relative flex items-center gap-2">
+              <span className="ml-4 px-6 py-2 bg-blue-900 text-white font-bold rounded-full flex items-center gap-2" style={{ backgroundColor: '#0D47A1', fontFamily: 'Montserrat, Arial, sans-serif' }}>
                 <span className="rounded-full bg-white text-blue-900 px-2 py-1 font-bold">{user.username || 'User'}</span>
-                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-2.21 3.58-4 8-4s8 1.79 8 4"/></svg>
-              </button>
-              {/* Dropdown menu placeholder */}
+                {user.emailVerified ? (
+                  <span className="ml-2 px-2 py-1 rounded bg-green-100 text-green-800 text-xs font-semibold">Verified</span>
+                ) : (
+                  <span className="ml-2 px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs font-semibold">Not Verified</span>
+                )}
+              </span>
+              <button className="ml-2 px-4 py-2 bg-white text-blue-900 font-bold rounded-full border border-blue-900 hover:bg-blue-50 transition" style={{ fontFamily: 'Montserrat, Arial, sans-serif' }} onClick={auth.logout}>Logout</button>
             </div>
           ) : (
             <>
@@ -81,30 +88,66 @@ export default function LandingPage() {
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative" style={{ minWidth: '340px', maxWidth: '450px' }} onClick={e => e.stopPropagation()}>
             <button className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold" onClick={() => setShowLogin(false)}>&times;</button>
             <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: '#1E3A8A', fontFamily: 'Montserrat, Arial, sans-serif' }}>Login to Your Account</h2>
-            <form className="flex flex-col gap-4" onSubmit={e => {e.preventDefault();}}>
-              <div className="relative">
-                <input type="text" name="loginEmail" className="peer w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder=" " required />
-                <label className="absolute left-2 top-3 text-gray-500 peer-focus:text-blue-900 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm">Email / Username</label>
+            <form className="flex flex-col gap-4" onSubmit={async e => {
+              e.preventDefault();
+              const email = e.target.loginEmail.value;
+              const password = e.target.loginPassword.value;
+              const res = await auth.login(email, password);
+              if (res.success) {
+                setShowLogin(false);
+              } else {
+                alert(res.error);
+              }
+            }}>
+              <div>
+                <input type="text" name="loginEmail" className="w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder="Email" required />
               </div>
-              <div className="relative">
-                <input type="password" name="loginPassword" className="peer w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder=" " required />
-                <label className="absolute left-2 top-3 text-gray-500 peer-focus:text-blue-900 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm">Password</label>
+              <div>
+                <input type="password" name="loginPassword" className="w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder="Password" required />
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="rememberMe" className="accent-blue-900" />
                   <label htmlFor="rememberMe" className="text-gray-700">Remember me</label>
                 </div>
-                <button type="button" className="text-blue-900 text-sm font-semibold hover:underline">Forgot Password?</button>
+                <button
+                  type="button"
+                  className="text-blue-900 text-sm font-semibold hover:underline"
+                  onClick={async () => {
+                    const email = prompt('Enter your email to reset password:');
+                    if (email) {
+                      const res = await auth.forgotPassword(email);
+                      if (res.success) {
+                        alert(res.message);
+                      } else {
+                        alert(res.error);
+                      }
+                    }
+                  }}
+                >Forgot Password?</button>
               </div>
               <button type="submit" className="w-full py-3 font-bold rounded-xl text-white text-lg bg-blue-900 hover:bg-blue-700 transition">Login</button>
               <button type="button" className="w-full py-3 font-bold rounded-xl text-blue-900 border border-gray-400 bg-white hover:bg-gray-100 transition mt-2" onClick={() => setShowLogin(false)}>Cancel</button>
               <div className="flex flex-col items-center gap-2 mt-4">
                 <span className="text-gray-500 text-sm">Or login with</span>
                 <div className="flex gap-4">
-                  <button type="button" className="px-4 py-2 rounded bg-red-500 text-white font-bold hover:bg-red-600 transition">Google</button>
-                  <button type="button" className="px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 transition">Facebook</button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 rounded bg-red-500 text-white font-bold hover:bg-red-600 transition"
+                    onClick={async () => {
+                      const res = await auth.loginWithGoogle();
+                      if (res.success) {
+                        setShowLogin(false);
+                        setShowSignup(false);
+                      } else {
+                        alert(res.error);
+                      }
+                    }}
+                  >Google</button>
                 </div>
+              </div>
+              <div className="mt-4 text-yellow-700 text-sm text-center">
+                <span>Note: You must verify your email before you can log in.</span>
               </div>
             </form>
           </div>
@@ -116,22 +159,35 @@ export default function LandingPage() {
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative" style={{ minWidth: '340px', maxWidth: '450px' }} onClick={e => e.stopPropagation()}>
             <button className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl font-bold" onClick={() => setShowSignup(false)}>&times;</button>
             <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: '#1E3A8A', fontFamily: 'Montserrat, Arial, sans-serif' }}>Create an Account</h2>
-            <form className="flex flex-col gap-4" onSubmit={e => {e.preventDefault();}}>
-              <div className="relative">
-                <input type="text" name="signupName" className="peer w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder=" " required />
-                <label className="absolute left-2 top-3 text-gray-500 peer-focus:text-blue-900 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm">Full Name</label>
+            <form className="flex flex-col gap-4" onSubmit={async e => {
+              e.preventDefault();
+              const name = e.target.signupName.value;
+              const email = e.target.signupEmail.value;
+              const password = e.target.signupPassword.value;
+              const confirm = e.target.signupConfirm.value;
+              if (password !== confirm) {
+                alert('Passwords do not match');
+                return;
+              }
+              const res = await auth.signup(name, email, password);
+              if (res.success) {
+                alert(res.message || 'Verification email sent. Please check your inbox.');
+                setShowSignup(false);
+              } else {
+                alert(res.error);
+              }
+            }}>
+              <div>
+                <input type="text" name="signupName" className="w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder="Full Name" required />
               </div>
-              <div className="relative">
-                <input type="email" name="signupEmail" className="peer w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder=" " required />
-                <label className="absolute left-2 top-3 text-gray-500 peer-focus:text-blue-900 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm">Email</label>
+              <div>
+                <input type="email" name="signupEmail" className="w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder="Email" required />
               </div>
-              <div className="relative">
-                <input type="password" name="signupPassword" className="peer w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder=" " required />
-                <label className="absolute left-2 top-3 text-gray-500 peer-focus:text-blue-900 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm">Password</label>
+              <div>
+                <input type="password" name="signupPassword" className="w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder="Password" required />
               </div>
-              <div className="relative">
-                <input type="password" name="signupConfirm" className="peer w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder=" " required />
-                <label className="absolute left-2 top-3 text-gray-500 peer-focus:text-blue-900 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:text-sm">Confirm Password</label>
+              <div>
+                <input type="password" name="signupConfirm" className="w-full border-b-2 border-blue-900 py-3 px-2 text-lg focus:outline-none focus:border-blue-700 bg-transparent" placeholder="Confirm Password" required />
               </div>
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="terms" required className="accent-blue-900" />
@@ -142,15 +198,47 @@ export default function LandingPage() {
               <div className="flex flex-col items-center gap-2 mt-4">
                 <span className="text-gray-500 text-sm">Or sign up with</span>
                 <div className="flex gap-4">
-                  <button type="button" className="px-4 py-2 rounded bg-red-500 text-white font-bold hover:bg-red-600 transition">Google</button>
-                  <button type="button" className="px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 transition">Facebook</button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 rounded bg-red-500 text-white font-bold hover:bg-red-600 transition"
+                    onClick={async () => {
+                      const res = await auth.loginWithGoogle();
+                      if (res.success) {
+                        setShowSignup(false);
+                        setShowLogin(false);
+                      } else {
+                        alert(res.error);
+                      }
+                    }}
+                  >Sign up with Google</button>
                 </div>
+              </div>
+              <div className="mt-4 text-blue-900 text-sm text-center">
+                <span>After signing up, check your email for a verification link. You must verify your email before you can log in.</span>
               </div>
             </form>
           </div>
         </div>
       )}
       </nav>
+      {/* Show user history when logged in */}
+      {user && history && history.length > 0 && (
+        <section className="w-full max-w-3xl mx-auto px-4 py-8">
+          <h2 className="text-2xl font-bold mb-4 text-blue-900" style={{ fontFamily: 'Montserrat, Arial, sans-serif' }}>Your Recent News Checks</h2>
+          <div className="grid grid-cols-1 gap-4">
+            {history.map((item, idx) => (
+              <div key={idx} className="bg-white rounded-xl shadow border border-blue-900 p-4 flex flex-col">
+                <div className="font-semibold text-lg text-blue-900 mb-1">{item.headline}</div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`px-3 py-1 rounded-full font-bold ${item.verdict === 'FAKE' ? 'bg-red-600 text-white' : item.verdict === 'REAL' ? 'bg-green-600 text-white' : 'bg-yellow-500 text-white'}`}>{item.verdict}</span>
+                  <span className="text-xs text-gray-500">{item.timestamp ? new Date(item.timestamp).toLocaleString() : ''}</span>
+                </div>
+                <div className="text-sm text-gray-700 mb-1">Source: {item.source_verification}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       {/* HERO SECTION WITH SLIDESHOW */}
   <section className="w-full relative flex items-center justify-center text-center" style={{marginTop: '60px', minHeight: '70vh', padding: 0}}>
         {/* Slideshow background */}
@@ -172,7 +260,18 @@ export default function LandingPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-white drop-shadow-lg" style={{ fontFamily: 'Montserrat, Poppins, Arial, sans-serif' }}>Detect Fake News Instantly with AI</h1>
           <p className="text-lg md:text-xl mb-8 text-white drop-shadow-lg" style={{ fontFamily: 'Roboto, Open Sans, Arial, sans-serif' }}>Check the credibility of news articles and headlines with real-time AI + fact-check APIs.</p>
           <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
-            <button className="px-8 py-4 bg-blue-600 text-white font-bold rounded-full shadow-lg text-xl hover:bg-blue-700 transition" style={{ fontFamily: 'Montserrat, Arial, sans-serif' }} onClick={() => navigate('/app')}>Try Now</button>
+            <button
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-full shadow-lg text-xl hover:bg-blue-700 transition"
+              style={{ fontFamily: 'Montserrat, Arial, sans-serif' }}
+              onClick={() => {
+                if (user && user.emailVerified) {
+                  navigate('/app');
+                } else {
+                  setShowLogin(true);
+                  setShowSignup(true);
+                }
+              }}
+            >Try Now</button>
             <button className="px-8 py-4 bg-white text-blue-900 font-bold rounded-full shadow-lg text-xl hover:bg-blue-50 transition border border-blue-900" style={{ fontFamily: 'Montserrat, Arial, sans-serif' }} onClick={() => window.location.href='#about'}>Learn More</button>
           </div>
         </div>
