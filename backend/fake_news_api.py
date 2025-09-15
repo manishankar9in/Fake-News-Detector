@@ -14,7 +14,7 @@ async def check_fake_news_hf(text: str) -> dict:
 
 # Example: Google Fact Check API
 GOOGLE_FACT_CHECK_API_URL = "https://factchecktools.googleapis.com/v1alpha1/claims:search"
-GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY"  # Replace with your key
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 async def check_fact_google(query: str) -> dict:
     params = {"query": query, "key": GOOGLE_API_KEY}
@@ -24,7 +24,7 @@ async def check_fact_google(query: str) -> dict:
 
 # Example: NewsAPI
 NEWSAPI_URL = "https://newsapi.org/v2/everything"
-NEWSAPI_KEY = "YOUR_NEWSAPI_KEY"  # Replace with your key
+NEWSAPI_KEY = os.environ.get("NEWSAPI_KEY")
 
 async def check_newsapi(query: str) -> dict:
     params = {"q": query, "apiKey": NEWSAPI_KEY}
@@ -43,7 +43,7 @@ async def check_gdelt(query: str) -> dict:
 
 # Example: Google Translate API (optional)
 TRANSLATE_API_URL = "https://translation.googleapis.com/language/translate/v2"
-TRANSLATE_API_KEY = "YOUR_TRANSLATE_API_KEY"  # Replace with your key
+TRANSLATE_API_KEY = os.environ.get("TRANSLATE_API_KEY")
 
 async def translate_to_english(text: str, source_lang: str) -> dict:
     params = {

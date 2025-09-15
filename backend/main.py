@@ -1,45 +1,89 @@
-import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Query, Response
+app = FastAPI(title="Fake News Detector API", version="1.0.0")
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+import logging
 import os
+from dotenv import load_dotenv
+load_dotenv()
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# ...existing code...
+app = FastAPI(title="Fake News Detector API", version="1.0.0")
+
+from fastapi import Response
+
+@app.options("/verify")
+async def options_verify():
+    return Response(status_code=200)
+
+from fastapi import FastAPI, Query, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+import logging
+import os
+from dotenv import load_dotenv
+load_dotenv()
+import firebase_admin
+from firebase_admin import credentials, firestore
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
 app = FastAPI(title="Fake News Detector API", version="1.0.0")
 
-logging.basicConfig(level=logging.INFO)
-logging.info(f"[DEBUG] NEWSAPI_KEY: {os.environ.get('NEWSAPI_KEY')}")
-logging.info(f"[DEBUG] GOOGLE_API_KEY: {os.environ.get('GOOGLE_API_KEY')}")
+# Firebase initialization
+FIREBASE_SERVICE_ACCOUNT_PATH = os.environ.get("FIREBASE_SERVICE_ACCOUNT_PATH")
+firebase_app = None
+firebase_db = None
+if FIREBASE_SERVICE_ACCOUNT_PATH and os.path.exists(FIREBASE_SERVICE_ACCOUNT_PATH):
+    try:
+        firebase_app = firebase_admin.get_app()
+    except ValueError:
+        cred = credentials.Certificate(FIREBASE_SERVICE_ACCOUNT_PATH)
+        firebase_app = firebase_admin.initialize_app(cred)
+    firebase_db = firestore.client()
+else:
+    logging.warning("Firebase service account path not set or file does not exist.")
 
-# Root endpoint for health/status check
-@app.get("/")
-async def root():
-    return {"message": "Fake News Detector API is running. Use /verify to check news headlines."}
 
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-# Load model (placeholder, can be expanded)
-tokenizer = AutoTokenizer.from_pretrained("Pulk17/Fake-News-Detection")
-model = AutoModelForSequenceClassification.from_pretrained("Pulk17/Fake-News-Detection")
 
-class NewsInput(BaseModel):
-    text: str = None
-    url: str = None
-    target_lang: str = "en"
-    return_lang: str = None
+app = FastAPI(title="Fake News Detector API", version="1.0.0")
 
-@app.post("/verify")
-async def verify_news(news: NewsInput):
-    newsapi_status = 500
+from fastapi import Response
+
+@app.options("/verify")
+async def options_verify():
+    return Response(status_code=200)
+
+# User history endpoint
+@app.get("/user-history")
+async def get_user_history(email: str = Query(...)):
+    if not firebase_db:
+        return JSONResponse(content={"error": "Firestore not configured"}, status_code=500)
+    try:
+        # Use Firestore's recommended 'filter' argument
+        docs = firebase_db.collection("verifications") \
+            .where('email', '==', email) \
+            .order_by("timestamp", direction=firestore.Query.DESCENDING) \
+            .limit(20).stream()
+        history = []
+        for doc in docs:
+            data = doc.to_dict()
+            history.append({
+                "headline": data.get("headline"),
+                "verdict": data.get("verdict"),
+                "source_verification": data.get("source_verification"),
+                "timestamp": str(data.get("timestamp")),
+                "results": data.get("results", {})
+            })
+        return JSONResponse(content={"history": history}, status_code=200)
+    except Exception as e:
+        logging.error(f"Error in /user-history: {e}")
+        return JSONResponse(content={"error": str(e)}, status_code=500)
     google_fact_status = 500
     gdelt_status = 500
     fullfact_results = []
@@ -174,36 +218,7 @@ async def verify_news(news: NewsInput):
     from difflib import SequenceMatcher
     from newspaper import Article
     try:
-        # 1. Language detection and translation
-        def detect_language(text):
-            if any('\u0900' <= char <= '\u097F' for char in text):
-                return "hi"
-            elif any('\u0C00' <= char <= '\u0C7F' for char in text):
-                return "te"
-            elif any(ord(char) > 127 for char in text):
-                return "other"
-            else:
-                return "en"
-        detected_lang = detect_language(news.text)
-        target_lang = news.return_lang if news.return_lang else "en"
-        detected_text = news.text
-        # Always attempt translation, even if languages match
-        try:
-            async with httpx.AsyncClient(timeout=15.0) as client:
-                mm_response = await client.get(
-                    "https://api.mymemory.translated.net/get",
-                    params={
-                        "q": news.text,
-                        "langpair": f"{detected_lang}|{target_lang}"
-                    }
-                )
-                if mm_response.status_code == 200:
-                    mm_data = mm_response.json()
-                    detected_text = mm_data.get("responseData", {}).get("translatedText", news.text)
-                else:
-                    detected_text = f"[Translation failed: {mm_response.status_code}] {news.text}"
-        except Exception as e:
-            detected_text = f"[Translation error: {str(e)}] {news.text}"
+        # Remove language detection and translation logic
 
 
         # 3. Web scraping for headline verification
@@ -526,8 +541,6 @@ async def verify_news(news: NewsInput):
         response_data = {
             "verdict": verdict,
             "display": f"Verdict: {verdict}\nSource Verification: {source_verification}",
-            "detected_language": detected_lang,
-            "translated_text": detected_text,
             "source_verification": source_verification,
             "webscraping_matched_headlines": matched_headlines,
             "webscraping_all_headlines": all_scraped_headlines,
@@ -542,6 +555,26 @@ async def verify_news(news: NewsInput):
             "real_news_summary": real_news_summary,
             "real_news_summary_scraped": real_news_summary_scraped
         }
+        # Store verification result in Firestore if available
+        if firebase_db:
+            try:
+                doc_ref = firebase_db.collection("verifications").document()
+                doc_ref.set({
+                    "headline": news.text,
+                    "verdict": verdict,
+                    "source_verification": source_verification,
+                    "timestamp": firestore.SERVER_TIMESTAMP,
+                    "results": {
+                        "newsapi": newsapi_results,
+                        "google_fact_check": google_fact_results,
+                        "gdelt": gdelt_results,
+                        "fullfact": fullfact_results,
+                        "openfact": openfact_results
+                    },
+                    "email": getattr(news, "email", None)
+                })
+            except Exception as e:
+                logging.error(f"Error saving to Firestore: {e}")
         return JSONResponse(
             content=response_data,
             media_type="application/json; charset=utf-8"
