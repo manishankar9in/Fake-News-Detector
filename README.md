@@ -11,10 +11,15 @@
     
  👋 Hii....Iam Manishankar
   
- 🔭 I’m intresed in:<br> 
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-🎯**Interactive Web Applications** – Bringing ideas to life with engaging user interfaces.<br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-🎯**Responsive Design** – Crafting applications that look great on any device.<br>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-🎯**JavaScript & React Ecosystem** – Diving deep into React, and the latest tools in the React ecosystem.<br>
+ 🔭 I’m intresed in:<br>  
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Frontend Development** – Building interactive and responsive user interfaces with **HTML5, CSS3, and JavaScript**.<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Backend Development** – Writing clean and efficient server-side code using **Python**.<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Database Management** – Designing and optimizing relational databases with **SQL**.<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Full Stack Projects** – Integrating frontend and backend into seamless, scalable applications.<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Web Security & Scalability** – Ensuring applications are safe, maintainable, and performance-driven.<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Continuous Learning** – Exploring frameworks like **React, Django, and Flask** to stay updated with industry trends.<br>  
+
  
  🌱 I’m currently learning **HTML5, CSS3, SQL, Python**
 
