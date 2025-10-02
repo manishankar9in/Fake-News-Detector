@@ -18,18 +18,18 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Database Management** – Designing and optimizing relational databases with **SQL**.<br>  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Full Stack Projects** – Integrating frontend and backend into seamless, scalable applications.<br>  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Web Security & Scalability** – Ensuring applications are safe, maintainable, and performance-driven.<br>  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Continuous Learning** – Exploring frameworks like **React, Django, and Flask** to stay updated with industry trends.<br>  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- 🎯 **Continuous Learning** – Exploring frameworks like **Django, and Flask** to stay updated with industry trends.<br>  
 
  
- 🌱 I’m currently learning **HTML5, CSS3, SQL, Python**
+ 🌱 I’m currently learning **HTML5, CSS3, SQL, Python, Javascript**
 
  💞 I'm looking to collaborate on.......developer roles.
  
  🛠️ Skills and Technologies:<br>
-     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -**FULL-STACK-WEBDEVELOPMENT:** HTML5, CSS3, SQL, Python <br>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -**FULL-STACK-WEBDEVELOPMENT:** HTML5, CSS3, SQL, Python, Javascript <br>
      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -**Styling Libraries:** CSS, Styled Components<br>
 
- 💬 Ask me about **HTML5, CSS3, SQL, PYTHON....🧐[Here](https://github.com/manishankar9in)**
+ 💬 Ask me about **HTML5, CSS3, SQL, PYTHON, Javascript....🧐[Here](https://github.com/manishankar9in)**
 
  🚀 Projects: **Fake news detector, Checking URL Vulnerabilty**<br>
   
@@ -53,7 +53,7 @@
 <h2 align="center">⚒️ Languages-Frameworks-Tools ⚒️</h2>
 <br/>
 <div align="center">
-    <img src="https://skillicons.dev/icons?i=html,css,sql,python,vscode,github"/>
+    <img src="https://skillicons.dev/icons?i=html,css,Javascript,sql,python,vscode,github"/>
 </div>
 
 <br/>
