@@ -41,7 +41,7 @@
   <a href="mailto:manishankar9in@gmail.com">
     <img src="https://img.shields.io/badge/Gmail-333333?style=for-the-badge&logo=gmail&logoColor=red" />
   </a>
-  <a href="https://github.com/manishankar9in" target="_blank">
+  <a href="https://www.linkedin.com/in/mani-shankar-yellumgudla-a773622a5" target="_blank">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank" />
   </a>
   <a href="https://github.com/manishankar9in" target="_blank">
@@ -53,7 +53,7 @@
 <h2 align="center">⚒️ Languages-Frameworks-Tools ⚒️</h2>
 <br/>
 <div align="center">
-    <img src="https://skillicons.dev/icons?i=html,css,Javascript,sql,python,vscode,github"/>
+    <img src="https://skillicons.dev/icons?i=html,css3,javascript,sql,python,vscode,github"/>
 </div>
 
 <br/>
