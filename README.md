@@ -9,7 +9,7 @@
 
 <div align="left">
     
- 👋 Hii....Iam Manishankar
+ 👋 Hii....I am Manishankar
   
  🔭 I’m intresed in:<br>  
 
